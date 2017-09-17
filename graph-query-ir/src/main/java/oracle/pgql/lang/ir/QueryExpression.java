@@ -77,7 +77,7 @@ public interface QueryExpression {
     ST_X,
     ST_Y,
     ST_POINT_FROM_TEXT,
-    CALL_STATEMENT
+    FUNCTION_CALL
   }
 
   ExpressionType getExpType();
@@ -1194,52 +1194,90 @@ public interface QueryExpression {
     }
   }
 
-  class CallStatement implements QueryExpression {
+  class FunctionCall implements QueryExpression {
 
     private final String packageName;
 
-    private final String routineName;
+    private final String functionName;
 
-    private final List<QueryExpression> exps;
+    private final List<QueryExpression> args;
 
-    public CallStatement(String routineName, List<QueryExpression> exps) {
-      this(null, routineName, exps);
+    public FunctionCall(String functionName, List<QueryExpression> exps) {
+      this(null, functionName, exps);
     }
 
-    public CallStatement(String packageName, String routineName, List<QueryExpression> exps) {
+    public FunctionCall(String packageName, String functionName, List<QueryExpression> exps) {
       this.packageName = packageName;
-      this.routineName = routineName;
-      this.exps = exps;
+      this.functionName = functionName;
+      this.args = exps;
     }
 
     public String getPackageName() {
       return packageName;
     }
 
-    public String getRoutineName() {
-      return routineName;
+    public String getFunctionName() {
+      return functionName;
     }
 
-    public List<QueryExpression> getExps() {
-      return exps;
+    public List<QueryExpression> getArgs() {
+      return args;
     }
 
     @Override
     public ExpressionType getExpType() {
-      return ExpressionType.CALL_STATEMENT;
+      return ExpressionType.FUNCTION_CALL;
     }
 
     @Override
     public String toString() {
-      String expressions = exps.stream().map(QueryExpression::toString).collect(Collectors.joining(", "));
+      String expressions = args.stream().map(QueryExpression::toString).collect(Collectors.joining(", "));
       String packageNamePart = packageName == null ? "" : packageName + ".";
-      return "CALL " + packageNamePart + routineName + "(" + expressions + ")";
+      return packageNamePart + functionName + "(" + expressions + ")";
     }
 
     @Override
     public void accept(QueryExpressionVisitor v) {
       v.visit(this);
     }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((args == null) ? 0 : args.hashCode());
+      result = prime * result + ((functionName == null) ? 0 : functionName.hashCode());
+      result = prime * result + ((packageName == null) ? 0 : packageName.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      FunctionCall other = (FunctionCall) obj;
+      if (args == null) {
+        if (other.args != null)
+          return false;
+      } else if (!args.equals(other.args))
+        return false;
+      if (functionName == null) {
+        if (other.functionName != null)
+          return false;
+      } else if (!functionName.equals(other.functionName))
+        return false;
+      if (packageName == null) {
+        if (other.packageName != null)
+          return false;
+      } else if (!packageName.equals(other.packageName))
+        return false;
+      return true;
+    }
+
   }
 
   interface Aggregation extends QueryExpression {

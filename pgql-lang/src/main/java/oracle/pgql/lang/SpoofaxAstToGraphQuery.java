@@ -97,9 +97,9 @@ public class SpoofaxAstToGraphQuery {
   private static final int POS_ST_X_EXP = 0;
   private static final int POS_ST_Y_EXP = 0;
   private static final int POS_ST_POINT_FROM_TEXT_EXP = 0;
-  private static final int POS_CALL_STATEMENT_PACKAGE_NAME = 0;
-  private static final int POS_CALL_STATEMENT_ROUTINE_NAME = 1;
-  private static final int POS_CALL_STATEMENT_EXPS = 2;
+  private static final int POS_FUNCTION_CALL_PACKAGE_NAME = 0;
+  private static final int POS_FUNCTION_CALL_FUNCTION_NAME = 1;
+  private static final int POS_FUNCTION_CALL_ARGS = 2;
 
   public static GraphQuery translate(IStrategoTerm ast) throws PgqlException {
 
@@ -566,13 +566,13 @@ public class SpoofaxAstToGraphQuery {
           LocalDateTime localTimestamp = LocalDateTime.parse(unquotedTimestampString, timestampFormatter);
           return new QueryExpression.Constant.ConstTimestamp(localTimestamp);
         }
-      case "CallStatement":
-        IStrategoTerm packageDeclT = t.getSubterm(POS_CALL_STATEMENT_PACKAGE_NAME);
+      case "FunctionCall":
+        IStrategoTerm packageDeclT = t.getSubterm(POS_FUNCTION_CALL_PACKAGE_NAME);
         String packageName = isNone(packageDeclT) ? null : getString(packageDeclT);
-        String routineName = getString(t.getSubterm(POS_CALL_STATEMENT_ROUTINE_NAME));
-        IStrategoTerm argsT = getList(t.getSubterm(POS_CALL_STATEMENT_EXPS));
+        String functionName = getString(t.getSubterm(POS_FUNCTION_CALL_FUNCTION_NAME));
+        IStrategoTerm argsT = getList(t.getSubterm(POS_FUNCTION_CALL_ARGS));
         List<QueryExpression> args = varArgsToExps(inScopeVars, inScopeInAggregationVars, argsT);
-        return new QueryExpression.CallStatement(packageName, routineName, args);
+        return new QueryExpression.FunctionCall(packageName, functionName, args);
       case "COUNT":
         exp = translateExp(t.getSubterm(POS_AGGREGATE_EXP), inScopeInAggregationVars, inScopeInAggregationVars);
         return new QueryExpression.Aggregation.AggrCount(exp);
