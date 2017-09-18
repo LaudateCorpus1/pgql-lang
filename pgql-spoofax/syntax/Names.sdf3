@@ -57,6 +57,13 @@ lexical syntax // reserved keywords
   FUNCTION-NAME = 'exists' {reject}
   FUNCTION-NAME = 'asc' {reject}
   FUNCTION-NAME = 'desc' {reject}
+  FUNCTION-NAME = 'all_different' {reject}
+  FUNCTION-NAME = 'st_x' {reject}
+  FUNCTION-NAME = 'st_y' {reject}
+  FUNCTION-NAME = 'ST_PointFromText' {reject}
+  FUNCTION-NAME = 'to_date' {reject}
+  FUNCTION-NAME = 'to_time' {reject}
+  FUNCTION-NAME = 'to_timestamp' {reject}
 
 lexical restrictions // greedy matching
 
