@@ -86,7 +86,7 @@ public class Pgql implements Closeable {
       // copy the PGQL Spoofax binary to the local file system.
       // IMPORTANT: don't replace this with resolveFile("res:...") or resolve("res:...") because VFS will fail to
       // replicate the resource when it's nested inside multiple JAR or WAR files.
-      URL inputUrl = getClass().getResource(File.separator + SPOOFAX_BINARIES);
+      URL inputUrl = getClass().getResource("/" + SPOOFAX_BINARIES);
       spoofaxBinaryFile = File.createTempFile(SPOOFAX_BINARIES, "");
       FileUtils.copyURLToFile(inputUrl, spoofaxBinaryFile);
       FileObject fileObject = spoofax.resourceService.resolve("jar:" + spoofaxBinaryFile.getAbsolutePath() + "!");
@@ -292,6 +292,10 @@ public class Pgql implements Closeable {
 
   @Override
   public void close() {
+    if (System.getProperty("os.name").startsWith("Windows")) {
+      return; // Windows issue, also see http://yellowgrass.org/issue/Spoofax/88
+    }
+
     if (spoofax != null) {
       spoofax.close();
     }
